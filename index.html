@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlushNYC | Find Your Relief</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <header>
+        <div class="search-container">
+            <input type="text" id="location-input" placeholder="Search NYC (e.g. Times Square)...">
+            <button class="icon-btn"><i class="fas fa-search"></i></button>
+        </div>
+        <div class="filters">
+            <button class="filter-chip active">All</button>
+            <button class="filter-chip" data-filter="baby"><i class="fas fa-baby"></i> Changing Station</button>
+            <button class="filter-chip" data-filter="mta"><i class="fas fa-subway"></i> MTA</button>
+            <button class="filter-chip" data-filter="free">Free Only</button>
+        </div>
+    </header>
+
+    <main id="app-container">
+        <div id="map-view">
+            <div class="map-mockup">
+                <i class="fas fa-location-dot marker" style="top: 40%; left: 30%;"></i>
+                <i class="fas fa-location-dot marker yellow" style="top: 55%; left: 60%;"></i>
+            </div>
+        </div>
+
+        <section id="detail-panel" class="hidden">
+            <div class="drag-handle"></div>
+            <div class="detail-header">
+                <h2 id="place-name">Bryant Park Restroom</h2>
+                <span class="status-badge open">Open 24h</span>
+            </div>
+            <p id="place-address">42nd St & 6th Ave, New York, NY</p>
+            
+            <div class="metrics">
+                <div class="metric"><i class="fas fa-clock"></i> <span id="wait-time">Short Wait</span></div>
+                <div class="metric"><i class="fas fa-star"></i> <span>4.8/5</span></div>
+            </div>
+
+            <div class="amenities" id="amenity-list">
+                </div>
+
+            <div class="action-buttons">
+                <button class="btn-primary"><i class="fas fa-directions"></i> Get Directions</button>
+                <button class="btn-secondary" id="report-busy">Report Busy</button>
+            </div>
+        </section>
+    </main>
+
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active"><i class="fas fa-map"></i><span>Map</span></a>
+        <a href="#" class="nav-item"><i class="fas fa-plus-circle"></i><span>Add</span></a>
+        <a href="#" class="nav-item"><i class="fas fa-gamepad"></i><span>Fun</span></a>
+        <a href="#" class="nav-item"><i class="fas fa-info-circle"></i><span>Resources</span></a>
+    </nav>
+
+    <script src="script.js"></script>
+</body>
+</html>
