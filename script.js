@@ -1,6 +1,10 @@
 async function fetchRestrooms() {
     const list = document.getElementById('restroom-list');
-    
+const SUPABASE_URL = 'https://your-project-id.supabase.co';
+const SUPABASE_ANON_KEY = 'your-anon-public-key';
+
+// Initialize the Supabase Client
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     // We fetch everything from your restrooms table
     // Including specific fields for wait_time and diapers
     const { data, error } = await _supabase
