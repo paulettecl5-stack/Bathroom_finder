@@ -5,6 +5,12 @@
    No backend or Supabase required.
    ──────────────────────────────────────────────── */
 
+// ── SUPABASE INITIALIZATION ───────────────────────
+const SUPABASE_URL = 'https://YOUR-PROJECT-ID.supabase.co'; // Replace with your URL
+const SUPABASE_ANON_KEY = 'YOUR-ANON-KEY'; // Replace with your Anon Key
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 "use strict";
 
 // ── CONFIG ────────────────────────────────────────
@@ -128,37 +134,25 @@ function onLocationError(err) {
  *  https://data.cityofnewyork.us/profile/edit/developer_settings
  *  and add it as X-App-Token header for production use).
  */
+
+// ── API FETCH (SUPABASE) ──────────────────────────
 async function fetchRestrooms() {
   if (userLat === null) return;
 
   showLoading();
 
-  // SoQL query: within_circle filters by geolocation server-side
-  const params = new URLSearchParams({
-    $where: `within_circle(location_1, ${userLat}, ${userLng}, ${MAX_RADIUS})`,
-    $limit: MAX_RESULTS,
-  });
-
-  const url = `${API_BASE}?${params.toString()}`;
-
   try {
-    const res = await fetch(url, {
-      headers: {
-        "Accept": "application/json",
-        // Uncomment and add your free app token for higher rate limits:
-        // "X-App-Token": "YOUR_APP_TOKEN_HERE",
-      },
-    });
+    // Fetch all restrooms from your Supabase 'restrooms' table
+    const { data, error } = await supabase
+      .from('restrooms')
+      .select('*');
 
-    if (!res.ok) throw new Error(`API error: ${res.status} ${res.statusText}`);
+    if (error) throw error;
 
-    const data = await res.json();
-
-    if (!Array.isArray(data)) throw new Error("Unexpected API response format.");
-
+    // Filter by radius client-side using your haversine function
     allResults = data
-      .filter(r => r.latitude && r.longitude)
-      .map(r => enrichRestroom(r));
+      .map(r => enrichSupabaseRestroom(r))
+      .filter(r => r.distanceM <= MAX_RADIUS);
 
     // Sort by distance ascending
     allResults.sort((a, b) => a.distanceM - b.distanceM);
@@ -167,32 +161,30 @@ async function fetchRestrooms() {
     initMap();
 
   } catch (err) {
-    console.error("FlushNYC fetch error:", err);
-    showError("Could not load restroom data. Please check your connection and try again.");
+    console.error("FlushNYC Supabase fetch error:", err);
+    showError("Could not load restroom data from database. Please check your connection.");
   }
 }
 
-// ── DATA ENRICHMENT ────────────────────────────────
-function enrichRestroom(r) {
-  const lat = parseFloat(r.latitude);
-  const lng = parseFloat(r.longitude);
-  const distanceM = haversine(userLat, userLng, lat, lng);
-  const hours = r.hours_of_operation || "";
-
+// ── NEW DATA ENRICHMENT ────────────────────────────
+// Maps your Supabase column names to the frontend properties
+function enrichSupabaseRestroom(r) {
+  const distanceM = haversine(userLat, userLng, r.latitude, r.longitude);
+  
   return {
     ...r,
-    lat,
-    lng,
+    lat: r.latitude,
+    lng: r.longitude,
     distanceM,
     distanceLabel: formatDistance(distanceM),
-    name:          r.facility_name || "Public Restroom",
-    address:       r.location_type || "See map for location",
-    borough:       inferBorough(lat, lng),
-    accessible:    accessibleLike(r.accessibility),
-    open24:        hours.toLowerCase().includes("24"),
-    changingTable: yesLike(r.changing_stations),
-    hoursNote:     hours,
-    operator:      r.operator || "",
+    name: r.facility_name,
+    address: r.location_type || "See map for location",
+    borough: inferBorough(r.latitude, r.longitude),
+    accessible: r.accessible,
+    open24: r.open24,
+    changingTable: r.changing_stations,
+    hoursNote: r.open24 ? "Open 24 Hours" : "",
+    operator: r.door_code ? `Code: ${r.door_code}` : (r.is_porta_potty ? "Porta Potty" : ""),
   };
 }
 
