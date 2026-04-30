@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FlushNYC — Find a Restroom Near You</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ───── HEADER ───── -->
+  <header class="site-header">
+    <div class="logo">
+      <span class="logo-icon">🚽</span>
+      <span class="logo-text">FlushNYC</span>
+    </div>
+    <nav class="header-nav">
+      <a href="#how-it-works">How it works</a>
+      <a href="#map-section">Map</a>
+    </nav>
+    <div class="header-auth" id="header-auth">
+      <!-- Filled by JS -->
+    </div>
+  </header>
+
+  <!-- ───── AUTH MODAL ───── -->
+  <div class="modal-overlay hidden" id="auth-modal">
+    <div class="modal">
+      <button class="modal-close" id="modal-close">✕</button>
+
+      <!-- Tab switcher -->
+      <div class="modal-tabs">
+        <button class="modal-tab active" data-tab="login">Log In</button>
+        <button class="modal-tab" data-tab="register">Register</button>
+      </div>
+
+      <!-- Login form -->
+      <form class="auth-form" id="login-form">
+        <h2 class="modal-title">Welcome back</h2>
+        <label>Email
+          <input type="email" id="login-email" autocomplete="email" required />
+        </label>
+        <label>Password
+          <input type="password" id="login-password" autocomplete="current-password" required />
+        </label>
+        <p class="auth-error hidden" id="login-error"></p>
+        <button type="submit" class="btn-primary" id="login-submit">Log In</button>
+      </form>
+
+      <!-- Register form -->
+      <form class="auth-form hidden" id="register-form">
+        <h2 class="modal-title">Create account</h2>
+        <label>Email
+          <input type="email" id="reg-email" autocomplete="email" required />
+        </label>
+        <label>Password
+          <input type="password" id="reg-password" autocomplete="new-password" required minlength="6" />
+        </label>
+        <label>Confirm Password
+          <input type="password" id="reg-password2" autocomplete="new-password" required minlength="6" />
+        </label>
+        <p class="auth-error hidden" id="reg-error"></p>
+        <button type="submit" class="btn-primary" id="reg-submit">Create Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ───── HERO ───── -->
+  <section class="hero">
+    <div class="hero-bg-text" aria-hidden="true">FLUSH</div>
+    <div class="hero-content">
+      <div class="hero-badge">NYC PUBLIC RESTROOM FINDER</div>
+      <h1 class="hero-headline">
+        When nature<br />calls,<br /><em>we answer.</em>
+      </h1>
+      <p class="hero-sub">
+        Real‑time public restroom data for all five boroughs — powered by NYC Open Data.
+      </p>
+      <button class="btn-primary" id="locate-btn">
+        <span class="btn-icon">📍</span>
+        Find Restrooms Near Me
+      </button>
+      <p class="hero-hint">Uses your current location. No account needed.</p>
+    </div>
+
+    <div class="hero-scroll-hint" aria-hidden="true">
+      <span>scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ───── HOW IT WORKS ───── -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="section-label">HOW IT WORKS</div>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-body">
+          <h3>Share Your Location</h3>
+          <p>Hit the button and allow location access. We use it only to find nearby restrooms — nothing is stored.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-body">
+          <h3>We Query Live Data</h3>
+          <p>We pull up‑to‑date restroom info directly from NYC Open Data in real time — no stale listings.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-body">
+          <h3>Pick Your Spot</h3>
+          <p>Browse results sorted by distance, filter by accessibility, and tap to get directions.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───── MAP + RESULTS ───── -->
+  <section class="map-section" id="map-section">
+
+    <!-- Search bar -->
+    <div class="search-bar-wrap">
+      <div class="search-bar">
+        <div class="borough-input-wrap">
+          <input
+            type="text"
+            id="borough-filter"
+            placeholder="Search by borough (e.g. Manhattan)…"
+            autocomplete="off"
+          />
+          <button class="btn-borough-search" id="borough-search-btn">Search</button>
+        </div>
+        <div class="filter-pills" id="filter-pills">
+          <button class="pill active" data-filter="all">All</button>
+          <button class="pill" data-filter="accessible">♿ Accessible</button>
+          <button class="pill" data-filter="open24">🌙 Open 24 hrs</button>
+          <button class="pill" data-filter="changing">🍼 Changing Table</button>
+        </div>
+      </div>
+      <button class="btn-locate-small" id="locate-btn-2">
+        <span>📍</span> Use My Location
+      </button>
+    </div>
+
+    <div class="map-results-layout">
+
+      <!-- Results panel -->
+      <div class="results-panel" id="results-panel">
+        <div class="results-header" id="results-header">
+          <span id="results-count-text">Enter your location to find restrooms</span>
+        </div>
+
+        <!-- State: idle -->
+        <div class="state-idle" id="state-idle">
+          <div class="idle-illustration" aria-hidden="true">🗽</div>
+          <p>Hit <strong>"Find Restrooms Near Me"</strong> to get started.<br/>We'll show you every public restroom within walking distance.</p>
+        </div>
+
+        <!-- State: loading -->
+        <div class="state-loading hidden" id="state-loading">
+          <div class="loader-ring"></div>
+          <p>Hunting for facilities…</p>
+        </div>
+
+        <!-- State: error -->
+        <div class="state-error hidden" id="state-error">
+          <div class="error-icon">⚠️</div>
+          <p id="error-msg">Something went wrong. Please try again.</p>
+          <button class="btn-primary small" id="retry-btn">Try Again</button>
+        </div>
+
+        <!-- State: results -->
+        <ul class="restroom-list hidden" id="restroom-list" aria-label="Nearby restrooms"></ul>
+      </div>
+
+      <!-- Map placeholder -->
+      <div class="map-wrap" id="map-wrap">
+        <div class="map-placeholder" id="map-placeholder">
+          <div class="map-placeholder-inner">
+            <span class="map-placeholder-icon">🗺️</span>
+            <span>Map loads after you search</span>
+          </div>
+        </div>
+        <div id="leaflet-map" class="hidden"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ───── FOOTER ───── -->
+  <footer class="site-footer">
+    <div class="footer-left">
+      <span class="logo-text small">🚽 FlushNYC</span>
+      <p>Data sourced from <a href="https://data.cityofnewyork.us/City-Government/Public-Restrooms/i7jb-7jku" target="_blank" rel="noopener">NYC Open Data</a>.</p>
+    </div>
+    <div class="footer-right">
+      <p>Built for New Yorkers who are always on the move.</p>
+    </div>
+  </footer>
+
+  <!-- Leaflet CSS + JS (map) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <!-- Supabase JS client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
