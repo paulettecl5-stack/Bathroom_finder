@@ -10,8 +10,8 @@
 // ── SUPABASE CONFIG ───────────────────────────────
 // Replace these two values with your own from:
 // Supabase Dashboard → Project Settings → API
-const SUPABASE_URL    = "https://frknwwxlmbiaredbunaf.supabase.co";
-const SUPABASE_ANON   = "sb_publishable_aoM0IQ0ZtNiXF8JgrxMTAw_auMtuvjo";
+const SUPABASE_URL    = "https://oqrzdjbjghnsyvulegay.supabase.co";
+const SUPABASE_ANON   = "sb_publishable_tqspp1ytPk9hYMRlcpV6mw_O9noLoAJ";
 
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
